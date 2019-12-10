@@ -1,0 +1,32 @@
+#----------netpie_message.py----------------
+import microgear.client as netpie
+import base64, zlib, time
+import random
+import datetime
+app = "FruitIdentification"
+key = "LmxpH4CF74zGOiJ"
+secret =  "HQVoigh0ZKFonW2lh1Sw2mXZq"
+
+netpie.create(key,secret,app,{'debugmode': True})
+
+def connection():
+	print ("Now I am connected with netpie")
+
+def subscription(topic,message):
+	print (topic+" "+message)
+
+netpie.setname("smartFarm")
+netpie.on_connect = connection
+netpie.on_message = subscription
+netpie.subscribe("/mails")
+
+netpie.connect()
+
+while True:
+	T1 = random.randint(10,30)		
+	H1 = random.randint(0,100)
+	smartFarm_message = str(T1) + "," + str(H1)
+	print(smartFarm_message)
+				
+	netpie.chat("smartFarm",smartFarm_message)
+	time.sleep(5)
