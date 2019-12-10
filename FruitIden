@@ -1,0 +1,33 @@
+url = "https://notify-api.line.me/api/notify"
+token = "LubdaAlP7rTRl48pYmX4pYfJosdwKlPoqcyysNIqkff" # your Line Notify token
+headers = {'Authorization':'Bearer '+token}
+
+def find_biggest_contour(image):
+    
+    # Copy to prevent modification
+    image = image.copy()
+    img, contours, hierarchy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    #print len(contours)
+
+    # Isolate largest contour
+    contour_sizes = [(cv2.contourArea(contour), contour) for contour in contours]
+    
+    if len(contour_sizes) == 0:
+        msg = {"message":"Fruits are unripe"}
+        res = requests.post(url, headers=headers , data = msg)
+        
+    else:
+        msg = {"message":"Fruits are Ripe"}
+        res = requests.post(url, headers=headers , data = msg)
+    
+    biggest_contour = max(contour_sizes, key=lambda x: x[0])[1]
+    
+ 
+    mask = np.zeros(image.shape, np.uint8)
+    cv2.drawContours(mask, [biggest_contour], -1, 255, -1)
+    return biggest_contour, mask
+
+big_contour, red_mask = find_biggest_contour(image_red_clean)
+show_mask(red_mask)
+
+print(res.text)
